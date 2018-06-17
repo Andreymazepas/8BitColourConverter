@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<body>
+<div style="width: 300px; height: 300px; display: block" id="24bitDiv">Im supposed to have the colour</div>
+
+
+  R: <input type="number" id="Rinput" min="0" max="255" onChange="onChangeRGB()"><br>
+  G: <input type="number" id="Ginput" min="0" max="255" onChange="onChangeRGB()"><br><br>
+  B: <input type="number" id="Binput" min="0" max="255" onChange="onChangeRGB()"><br><br>
+  Color: <input type="color" id="colourpicker" onChange="onChangeColourPicker()">
+  Hex: <input type="text" id="hexinput" onChange="onChangeHex()">
+
+  R: <input type="number" id="Routput" min="0" max="7"><br>
+  G: <input type="number" id="Goutput" min="0" max="7"><br>
+  B: <input type="number" id="Boutput" min="0" max="3"><br>
+
+<button onclick="convertFromRGB()">Convert from RGB</button>
+<button onclick="convertFromHex()">Convert from Hex</button>
+<button onclick="convertFromColour()">Convert from Colour Picker</button>
+
+<div style="width: 300px; height: 300px; display: block" id="8bitDiv">Im supposed to have the convertedcolour</div>
+
+<script>
+
+function onChangeRGB() {
+    var rgb = {
+        r: document.getElementById("Rinput").value,
+        g: document.getElementById("Ginput").value,
+        b: document.getElementById("Binput").value
+    }
+    console.log(rgb)
+    setInputBG(rgbToHex(rgb))
+}
+
+function onChangeHex() {
+    setInputBG('#' + document.getElementById("hexinput").value)
+}
+function onChangeColourPicker() {
+    setInputBG(document.getElementById("colourpicker").value)
+}
+
+function setInputBG(colour) {
+    var div = document.getElementById( '24bitDiv' );
+    div.style.backgroundColor = colour;
+}
+
+function hexToRgb(hex) {
+    var bigint = parseInt(hex, 16);
+    var r = (bigint >> 16) & 255;
+    var g = (bigint >> 8) & 255;
+    var b = bigint & 255;
+
+    return {r: r,
+            g: g,
+            b: b};
+}
+
+function componentToHex(c) {
+    var hex = Math.abs(c).toString(16);
+    console.log(hex)
+    return hex.length == 1 ? "0" + hex : hex;
+}
+
+function rgbToHex(rgb) {
+    return "#" + componentToHex(rgb.r) + componentToHex(rgb.g) + componentToHex(rgb.b);
+}
+
+function convertFromHex() {
+    var hex = document.getElementById("hexinput").value
+    var rgb = hexToRgb(hex)
+    setOutputValues(rgb)
+}
+
+function convertFromRGB() {
+    var rgb = {
+        r: document.getElementById("Rinput").value,
+        g: document.getElementById("Ginput").value,
+        b: document.getElementById("Binput").value
+    }
+    setOutputValues(rgb)
+}
+
+function convertFromColour() {
+    var rgb = hexToRgb(document.getElementById("colourpicker").value.slice(1))
+    setOutputValues(rgb)
+}
+
+function setOutputValues(colour) {
+    var red = Math.round((colour.r * 7) / 255);
+    var green = Math.round((colour.g * 7) / 255);
+    var blue = Math.round((colour.b * 3) / 255);
+    var byte = (red << 5) | (green << 2) | blue;
+    setOutputBG(byte)
+    document.getElementById("Routput").value = red
+    document.getElementById("Goutput").value = green
+    document.getElementById("Boutput").value = blue
+}
+
+function setOutputBG(_8bitColour){
+    Red   = (_8bitColour >> 5) * 255 / 7
+    Green = ((_8bitColour >> 2) & 0x07) * 255 / 7
+    Blue  = (_8bitColour & 0x03) * 255 / 3
+    var div = document.getElementById( '8bitDiv' );
+    div.style.backgroundColor = "rgb(" + Red + "," + Green + "," + Blue + ")";
+}
+
+</script>
+
+</body>
+</html>
